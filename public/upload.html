@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload Notes — YUR Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+
+<!-- ── Top Navbar ── -->
+<nav class="sticky-navbar">
+  <div class="container-custom navbar-inner">
+    <a class="nav-logo" href="/dashboard.html">
+      <div class="icon-box"><i class="bi bi-book-half" style="color:#fff;"></i></div>
+      <span>YUR Hub</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-item" href="/dashboard.html">Dashboard</a>
+      <a class="nav-item" href="/upload.html">Upload Notes</a>
+      <a class="nav-item" href="/requests.html">Requests</a>
+    </div>
+    <div class="nav-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="nav-avatar">S</div>
+        <span id="nav-name">Student</span>
+      </div>
+      <button class="btn-icon" onclick="logout()" title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Main ── -->
+<div class="container-custom" style="padding-top: 1.5rem;">
+  
+  <div class="page-header" style="text-align: center; justify-content: center; flex-direction: column; align-items: center;">
+    <h1 class="page-title"><i class="bi bi-cloud-arrow-up" style="color: var(--accent-1);"></i> Upload a Note</h1>
+    <p class="page-subtitle" style="max-width: 500px;">Share your knowledge with thousands of students. All uploads are reviewed to ensure high quality.</p>
+  </div>
+
+  <div class="upload-panel mb-5">
+    <form id="upload-form" novalidate>
+
+      <div class="mb-4">
+        <label class="form-label" for="up-title">Note Title</label>
+        <input id="up-title" type="text" class="form-control" placeholder="e.g. Operating Systems — Process Synchronization" required/>
+      </div>
+
+      <div class="row mb-4 g-3">
+        <div class="col-md-6">
+          <label class="form-label" for="up-subject">Subject Topic</label>
+          <input id="up-subject" type="text" class="form-control" placeholder="e.g. OS, DSA, Networks" required/>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="up-college">College</label>
+          <input id="up-college" type="text" class="form-control" placeholder="e.g. JNTU (Optional)"/>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="up-semester">Semester</label>
+          <select id="up-semester" class="form-select" required>
+            <option value="">Select Semester (Required)</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+            <option value="7">Semester 7</option>
+            <option value="8">Semester 8</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="up-desc">Brief Description <span style="color:var(--text-muted); font-weight:normal;">(optional)</span></label>
+        <textarea id="up-desc" class="form-control" rows="3" placeholder="What chapters does this document cover?"></textarea>
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label">Upload File <span style="color:var(--text-muted); font-weight:normal;">(PDF, JPG, PNG — max 10MB)</span></label>
+        <div class="file-drop" id="drop-zone">
+          <i class="bi bi-file-earmark-arrow-up"></i>
+          <p style="font-weight: 600; margin-bottom: 0.25rem;">Click or drag file here to upload</p>
+          <p style="font-size: 0.8rem; color: var(--text-muted);">Ensure your scan is clear and legible</p>
+          <input type="file" id="note-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;"/>
+          <p id="file-name-display" style="display:none; color: var(--success); font-weight:600; margin-top:1rem;"></p>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary-custom" id="upload-btn">
+        <span id="upload-btn-text">Submit for Review</span>
+        <span id="upload-btn-loading" style="display:none">
+          <div class="spinner"></div> Submitting...
+        </span>
+      </button>
+
+    </form>
+  </div>
+
+  <hr style="border-color: var(--border); margin: 3rem 0;">
+
+  <!-- My Uploads Array -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 1.5rem;">
+    <h3 style="font-size:1.25rem; margin:0;">Your Previous Uploads <span style="font-size:0.85rem; font-weight:500; color:var(--text-muted); margin-left:0.5rem;" id="my-uploads-count">0 notes</span></h3>
+  </div>
+  
+  <div id="my-uploads-container">
+    <div class="loading-block"><div class="spinner"></div><p>Fetching your uploads...</p></div>
+  </div>
+
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/upload.js"></script>
+</body>
+</html>

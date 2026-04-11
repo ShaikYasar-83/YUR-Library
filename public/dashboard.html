@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — YUR Hub</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+  <link rel="stylesheet" href="/css/styles.css"/>
+</head>
+<body>
+
+<!-- ── Top Navbar ── -->
+<nav class="sticky-navbar">
+  <div class="container-custom navbar-inner">
+    <a class="nav-logo" href="/dashboard.html">
+      <div class="icon-box"><i class="bi bi-book-half" style="color:#fff;"></i></div>
+      <span>YUR Hub</span>
+    </a>
+    <div class="nav-links">
+      <a class="nav-item" href="/dashboard.html">Dashboard</a>
+      <a class="nav-item" href="/upload.html">Upload Notes</a>
+      <a class="nav-item" href="/requests.html">Requests</a>
+    </div>
+    <div class="nav-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="nav-avatar">S</div>
+        <span id="nav-name">Student</span>
+      </div>
+      <button class="btn-icon" onclick="logout()" title="Logout">
+        <i class="bi bi-box-arrow-right"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="container-custom" style="padding-top: 1rem;">
+  
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Browse Notes</h1>
+      <p class="page-subtitle">Find & download high-quality study materials</p>
+    </div>
+    <button class="btn-primary-custom" style="width: auto;" onclick="window.location.href='/upload.html'">
+      <i class="bi bi-cloud-arrow-up"></i> Upload
+    </button>
+  </div>
+
+  <!-- Filter & Search Bar -->
+  <div class="filter-panel">
+    <div class="search-input-wrapper">
+      <i class="bi bi-search"></i>
+      <input type="text" id="search-input" placeholder="Search by title, keywords..." />
+    </div>
+    <select class="form-select" id="filter-semester" style="max-width: 140px;">
+      <option value="">Sem (All)</option>
+      <option value="1">Sem 1</option>
+      <option value="2">Sem 2</option>
+      <option value="3">Sem 3</option>
+      <option value="4">Sem 4</option>
+      <option value="5">Sem 5</option>
+      <option value="6">Sem 6</option>
+      <option value="7">Sem 7</option>
+      <option value="8">Sem 8</option>
+    </select>
+    <select class="form-select" id="filter-subject" style="max-width: 180px;">
+      <option value="">All Subjects</option>
+    </select>
+    <select class="form-select" id="filter-college" style="max-width: 220px;">
+      <option value="">All Colleges</option>
+    </select>
+    <select class="form-select" id="filter-sort" style="max-width: 150px;">
+      <option value="latest">Latest</option>
+      <option value="popular">Most Popular</option>
+    </select>
+    <button class="btn-outline" id="clear-filters" title="Reset Filters">
+      <i class="bi bi-arrow-counterclockwise"></i> Reset
+    </button>
+  </div>
+
+  <!-- Dynamic Content -->
+  <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 1.5rem;">
+    <h3 style="font-size:1.25rem; margin:0;">All Results <span style="font-size:0.85rem; font-weight:500; color:var(--text-muted); margin-left:0.5rem;" id="notes-count">0 notes</span></h3>
+  </div>
+
+  <div id="notes-container">
+    <div class="loading-block"><div class="spinner"></div><p>Loading the best notes...</p></div>
+  </div>
+
+</div>
+
+<!-- ── Review Modal (Notion-style form tweak) ── -->
+<div class="modal fade modal-dark" id="reviewModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header d-flex justify-content-between align-items-center">
+        <h5 class="modal-title m-0"><i class="bi bi-star-fill text-warning me-2"></i>Rate Note</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pb-0">
+        <p class="text-muted small" id="review-note-title"></p>
+        <label class="form-label mt-2">Tap a star to rate</label>
+        <div class="star-selector" id="star-select">
+          <i class="bi bi-star" data-val="1"></i>
+          <i class="bi bi-star" data-val="2"></i>
+          <i class="bi bi-star" data-val="3"></i>
+          <i class="bi bi-star" data-val="4"></i>
+          <i class="bi bi-star" data-val="5"></i>
+        </div>
+        <input type="hidden" id="review-rating" value="0"/>
+        
+        <label class="form-label mt-4">Written Feedback <span class="text-muted">(optional)</span></label>
+        <textarea id="review-comment" class="form-control mb-3" rows="3" placeholder="Did this help you study?"></textarea>
+        <input type="hidden" id="review-note-id"/>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button class="btn btn-outline" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary-custom" style="width: auto;" id="submit-review-btn">
+          Leave Review
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>

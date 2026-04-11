@@ -1,0 +1,7 @@
+node_modules/
+.env
+*.log
+
+# Uploaded files (keep folder, ignore contents)
+uploads/*
+!uploads/.gitkeep
