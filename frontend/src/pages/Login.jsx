@@ -17,10 +17,10 @@ const Login = () => {
     setErrorMsg('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }) // the backend might use role if needed, or simply resolves by credentials
+        body: JSON.stringify({ email, password }) 
       });
 
       const data = await response.json();
@@ -40,9 +40,9 @@ const Login = () => {
 
       // Redirect legacy paths
       if (data.user.role === 'admin') {
-        window.location.href = 'http://localhost:5000/admin-dashboard.html';
+        window.location.href = '/admin-dashboard.html';
       } else {
-        window.location.href = 'http://localhost:5000/dashboard.html';
+        window.location.href = '/dashboard.html';
       }
 
     } catch (err) {
@@ -93,9 +93,9 @@ const Login = () => {
         <div className="auth-header">
           <div className="nav-logo" style={{ justifyContent: 'center', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
             <div className="icon-box" style={{ background: isAdmin ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : 'var(--accent-1)' }}>
-              {isAdmin ? '🛡️' : '📚'}
+              {isAdmin ? <i className="bi bi-shield-check" style={{ color: '#fff' }}></i> : <i className="bi bi-book-half" style={{ color: '#fff' }}></i>}
             </div>
-            <span>{isAdmin ? 'Admin Portal' : 'YUR Hub'}</span>
+            <span>{isAdmin ? 'Admin Portal' : 'YUR LIBRARY'}</span>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
             {isAdmin ? 'Sign in to manage users and resources' : 'Sign in to sync your notes across devices'}
@@ -168,7 +168,7 @@ const Login = () => {
             </div>
 
             <button 
-              onClick={() => window.location.href = 'http://localhost:5000/dashboard.html'}
+              onClick={() => window.location.href = '/dashboard.html'}
               style={{
                 width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--accent-1)', background: 'none',
@@ -181,6 +181,13 @@ const Login = () => {
               Continue as Guest
             </button>
           </>
+        )}
+
+        {!isAdmin && (
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+            Don't have an account? 
+            <Link to="/signup" style={{ color: 'var(--accent-1)', fontWeight: 600, marginLeft: '0.4rem' }}>Create Account</Link>
+          </p>
         )}
       </div>
     </div>

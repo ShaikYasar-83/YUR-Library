@@ -1,34 +1,3 @@
-# Student Notes Sharing Platform
-
-This repository now separates frontend and backend code into distinct folders.
-
-## Project structure
-
-- `backend/` - Node.js + Express backend API with MongoDB, server code, and static content
-- `frontend/` - React + Vite frontend application
-
-## Running the backend
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
-## Running the frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Notes
-
-- Backend code was moved into `backend/`
-- Existing frontend code remains in `frontend/`
-- The backend server now resolves React build assets from `../frontend/dist`
-- Root `.gitignore` now ignores both frontend and backend dependency folders
 # 📚 YUR LIBRARY
 
 A clean and structured **REST API backend** built with **Node.js**, **Express.js**, and **MongoDB (Mongoose)**.

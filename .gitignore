@@ -1,7 +1,13 @@
 node_modules/
-.env
+backend/node_modules/
+frontend/node_modules/
+**/.env
 *.log
 
 # Uploaded files (keep folder, ignore contents)
-uploads/*
-!uploads/.gitkeep
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Frontend build output
+frontend/dist/
+
