@@ -9,7 +9,10 @@ const Login = () => {
   const [isAdmin, setIsAdmin] = useState(() => {
     return new URLSearchParams(window.location.search).get('admin') === 'true';
   });
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState(() => {
+    const msg = new URLSearchParams(window.location.search).get('msg');
+    return msg === 'login_required' ? 'Please sign in to access this feature.' : '';
+  });
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -53,48 +56,46 @@ const Login = () => {
   };
 
   return (
-    <div className="auth-container" style={{ position: 'relative' }}>
-      
-      {/* Corner Admin Login Button */}
-      {!isAdmin && (
-        <button 
-          onClick={() => setIsAdmin(true)}
-          style={{
-            position: 'absolute', top: '1.5rem', right: '1.5rem',
-            background: 'none', border: '1px solid var(--border-light)',
-            color: 'var(--text-muted)', padding: '0.5rem 1rem',
-            borderRadius: '40px', cursor: 'pointer', fontWeight: 600,
-            transition: 'var(--transition)'
-          }}
-          onMouseOver={(e) => e.target.style.color = 'var(--text-primary)'}
-          onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
-        >
-          <i className="bi bi-shield-lock me-1"></i> Admin Sign In
-        </button>
-      )}
+    <div className="auth-container" style={{ flexDirection: 'column' }}>
+      {/* Top Action Bar (Admin Toggle) */}
+      <div style={{ width: '100%', maxWidth: '460px', display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        {!isAdmin && (
+          <button 
+            onClick={() => setIsAdmin(true)}
+            style={{
+              background: 'none', border: '1px solid var(--border-light)',
+              color: 'var(--text-muted)', padding: '0.4rem 0.8rem',
+              borderRadius: '40px', cursor: 'pointer', fontWeight: 600,
+              transition: 'var(--transition)', fontSize: '0.85rem'
+            }}
+            onMouseOver={(e) => e.target.style.color = 'var(--text-primary)'}
+            onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
+          >
+            <i className="bi bi-shield-lock me-1"></i> Admin Sign In
+          </button>
+        )}
 
-      {isAdmin && (
-        <button 
-          onClick={() => setIsAdmin(false)}
-          style={{
-            position: 'absolute', top: '1.5rem', left: '1.5rem',
-            background: 'none', border: '1px solid var(--border-light)',
-            color: 'var(--text-muted)', padding: '0.5rem 1rem',
-            borderRadius: '40px', cursor: 'pointer', fontWeight: 600,
-            transition: 'var(--transition)'
-          }}
-        >
-          <i className="bi bi-arrow-left me-1"></i> Back
-        </button>
-      )}
+        {isAdmin && (
+          <button 
+            onClick={() => setIsAdmin(false)}
+            style={{
+              marginRight: 'auto', // Pushes it to the left
+              background: 'none', border: '1px solid var(--border-light)',
+              color: 'var(--text-muted)', padding: '0.4rem 0.8rem',
+              borderRadius: '40px', cursor: 'pointer', fontWeight: 600,
+              transition: 'var(--transition)', fontSize: '0.85rem'
+            }}
+          >
+            <i className="bi bi-arrow-left me-1"></i> Back
+          </button>
+        )}
+      </div>
 
       {/* Shared Auth Card (Admin or Student) */}
       <div className="auth-card">
         <div className="auth-header">
           <div className="nav-logo" style={{ justifyContent: 'center', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
-            <div className="icon-box" style={{ background: isAdmin ? 'linear-gradient(135deg, #f59e0b, #ef4444)' : 'var(--accent-1)' }}>
-              {isAdmin ? <i className="bi bi-shield-check" style={{ color: '#fff' }}></i> : <i className="bi bi-book-half" style={{ color: '#fff' }}></i>}
-            </div>
+            <img src="/images/logo.jpg" alt="YUR LIBRARY Logo" style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
             <span>{isAdmin ? 'Admin Portal' : 'YUR LIBRARY'}</span>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>

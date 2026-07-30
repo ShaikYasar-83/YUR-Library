@@ -1,5 +1,7 @@
 const Note = require("../models/Note");
 const path = require("path");
+const mongoose = require("mongoose");
+const { Readable } = require("stream");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // @desc    Upload a new note with a file
@@ -27,9 +29,22 @@ const uploadNote = async (req, res) => {
       });
     }
 
-    // Step 3: Build the public-accessible file URL
-    // e.g. http://localhost:5000/uploads/note-1712345678.pdf
-    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    // Step 3: Stream file to MongoDB GridFS
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "notesFiles"
+    });
+
+    const uploadStream = bucket.openUploadStream(req.file.originalname, {
+      contentType: req.file.mimetype,
+    });
+
+    const readable = Readable.from(req.file.buffer);
+    readable.pipe(uploadStream);
+
+    await new Promise((resolve, reject) => {
+      uploadStream.on("finish", resolve);
+      uploadStream.on("error", reject);
+    });
 
     // Step 4: Determine file type from mimetype
     const mimeToType = {
@@ -40,19 +55,21 @@ const uploadNote = async (req, res) => {
     const fileType = mimeToType[req.file.mimetype] || "unknown";
 
     // Step 5: Save note to MongoDB
-    // req.user is set by the protect middleware (logged-in user)
-    const note = await Note.create({
+    const note = new Note({
       title,
       subject,
       college,
       description,
       semester: semester ? Number(semester) : undefined,
-      fileUrl,
       fileName: req.file.originalname,
       fileType,
       uploadedBy: req.user._id, // ← from JWT protect middleware
       status: "pending",        // default — needs admin approval
+      gridFsFileId: uploadStream.id,
     });
+
+    note.fileUrl = `${req.protocol}://${req.get("host")}/api/notes/view/${note._id}`;
+    await note.save();
 
     res.status(201).json({
       success: true,
@@ -178,6 +195,17 @@ const deleteNote = async (req, res) => {
         success: false,
         message: "You are not allowed to delete this note",
       });
+    }
+
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "notesFiles"
+    });
+    if (note.gridFsFileId) {
+      try {
+        await bucket.delete(note.gridFsFileId);
+      } catch (err) {
+        console.error("GridFS file not found for deletion", err);
+      }
     }
 
     await note.deleteOne();
@@ -342,8 +370,20 @@ const downloadNote = async (req, res) => {
 
     await Note.findByIdAndUpdate(req.params.id, { $inc: { downloadsCount: 1 } });
 
-    const filePath = path.join(__dirname, "../../uploads", path.basename(note.fileUrl));
-    res.download(filePath, note.fileName || path.basename(filePath));
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "notesFiles"
+    });
+    
+    const contentType = {
+      "pdf": "application/pdf",
+      "jpg": "image/jpeg",
+      "jpeg": "image/jpeg",
+      "png": "image/png"
+    }[note.fileType] || "application/octet-stream";
+
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${note.fileName}"`);
+    bucket.openDownloadStream(note.gridFsFileId).pipe(res);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -357,20 +397,21 @@ const viewNote = async (req, res) => {
 
     await Note.findByIdAndUpdate(req.params.id, { $inc: { viewsCount: 1 } });
 
-    const filePath = path.join(__dirname, "../../uploads", path.basename(note.fileUrl));
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "notesFiles"
+    });
 
-    // Determine the content type
-    const ext = path.extname(filePath).toLowerCase();
     const contentType = {
-      ".pdf": "application/pdf",
-      ".jpg": "image/jpeg",
-      ".jpeg": "image/jpeg",
-      ".png": "image/png"
-    }[ext] || "application/octet-stream";
+      "pdf": "application/pdf",
+      "jpg": "image/jpeg",
+      "jpeg": "image/jpeg",
+      "png": "image/png"
+    }[note.fileType] || "application/octet-stream";
 
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", "inline");
-    res.sendFile(filePath);
+    
+    bucket.openDownloadStream(note.gridFsFileId).pipe(res);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -403,26 +444,47 @@ const bulkUploadNotes = async (req, res) => {
     };
 
     // Step 3: Map each file to a Note creation promise
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "notesFiles"
+    });
+
     const notePromises = req.files.map((file, index) => {
-      const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${file.filename}`;
-      const fileType = mimeToType[file.mimetype] || "unknown";
+      return new Promise((resolve, reject) => {
+        const uploadStream = bucket.openUploadStream(file.originalname, {
+          contentType: file.mimetype,
+        });
 
-      // Determine the title: use provided title + index, or original filename
-      let noteTitle = baseTitle 
-        ? `${baseTitle} (${index + 1})` 
-        : path.parse(file.originalname).name;
+        const readable = Readable.from(file.buffer);
+        readable.pipe(uploadStream);
 
-      return Note.create({
-        title: noteTitle,
-        subject,
-        college,
-        description,
-        semester: semester ? Number(semester) : undefined,
-        fileUrl,
-        fileName: file.originalname,
-        fileType,
-        uploadedBy: req.user._id,
-        status: "pending",
+        uploadStream.on("error", reject);
+        uploadStream.on("finish", async () => {
+          try {
+            const fileType = mimeToType[file.mimetype] || "unknown";
+            let noteTitle = baseTitle 
+              ? `${baseTitle} (${index + 1})` 
+              : path.parse(file.originalname).name;
+
+            const note = new Note({
+              title: noteTitle,
+              subject,
+              college,
+              description,
+              semester: semester ? Number(semester) : undefined,
+              fileName: file.originalname,
+              fileType,
+              uploadedBy: req.user._id,
+              status: "pending",
+              gridFsFileId: uploadStream.id,
+            });
+
+            note.fileUrl = `${req.protocol}://${req.get("host")}/api/notes/view/${note._id}`;
+            await note.save();
+            resolve(note);
+          } catch (err) {
+            reject(err);
+          }
+        });
       });
     });
 

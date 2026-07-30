@@ -241,6 +241,20 @@ document.getElementById("admin-upload-form").addEventListener("submit", async (e
   }
 });
 
+// ─── Stats ────────────────────────────────────────────────────
+const loadAdminStats = async () => {
+  try {
+    const res = await apiFetch("/stats/admin");
+    if (res && res.data) {
+      document.getElementById("stat-users").textContent = res.data.happyUsersAlive.toLocaleString();
+      document.getElementById("stat-visits").textContent = res.data.globalExplorations.toLocaleString();
+    }
+  } catch (err) {
+    console.error("Failed to load admin stats:", err);
+  }
+};
+
 // ─── Boot ─────────────────────────────────────────────────────
+loadAdminStats();
 loadAdminNotes();
 loadAdminRequests();

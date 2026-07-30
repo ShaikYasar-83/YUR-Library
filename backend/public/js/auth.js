@@ -2,6 +2,14 @@
 
 requireGuest(); // redirect to dashboard if already logged in
 
+// Check for redirect messages from protected pages
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get("msg") === "login_required") {
+  showToast("Please sign in to access this feature.", "error");
+  // Clean up URL so it doesn't re-trigger on refresh
+  window.history.replaceState({}, document.title, "/login.html");
+}
+
 // ────────────────────────────────────────────────────────────
 // Password toggle (login page only)
 // ────────────────────────────────────────────────────────────

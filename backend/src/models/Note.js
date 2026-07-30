@@ -33,10 +33,15 @@ const noteSchema = new mongoose.Schema(
       maxlength: [500, "Description cannot exceed 500 characters"],
     },
 
-    // Path/URL of the uploaded file (set by multer after upload)
+    // Reference to the physical file stored in MongoDB GridFS
+    gridFsFileId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, "GridFS File ID is required"],
+    },
+
+    // Path/URL of the uploaded file (kept for frontend backward compatibility)
     fileUrl: {
       type: String,
-      required: [true, "File is required"],
     },
 
     // Original file name (for display purposes)

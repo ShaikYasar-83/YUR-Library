@@ -54,8 +54,14 @@ app.use("/api/notes", noteRoutes);
 // Reviews API routes
 app.use("/api/reviews", reviewRoutes);
 
+const statRoutes = require("./routes/statRoutes");
+
+// ... (other route mounts)
 // Requests API routes
 app.use("/api/requests", requestRoutes);
+
+// Stats API routes
+app.use("/api/stats", statRoutes);
 
 // ─── Multer Error Handler ────────────────────────────────────────────────────
 // Catches multer errors (wrong file type, file too large) and returns clean JSON

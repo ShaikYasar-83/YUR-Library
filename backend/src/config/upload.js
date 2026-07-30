@@ -9,24 +9,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// ─── Step 2: Configure Storage ────────────────────────────────────────────────
-// diskStorage tells multer WHERE to save files and WHAT to name them.
-
-const storage = multer.diskStorage({
-  // destination: which folder to save uploaded files
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-
-  // filename: give each file a unique name to avoid overwrites
-  // Format: note-<timestamp>-<random>.<ext>
-  // Example: note-1712345678901-482910234.pdf
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname).toLowerCase(); // e.g. ".pdf"
-    cb(null, "note-" + uniqueSuffix + ext);
-  },
-});
+const storage = multer.memoryStorage();
 
 // ─── Step 3: File Filter (Allow only PDF, JPG, PNG) ──────────────────────────
 // This runs BEFORE the file is saved. If rejected, multer throws an error.

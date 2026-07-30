@@ -12,7 +12,7 @@ const clearAuth = ()       => { localStorage.removeItem("token"); localStorage.r
 
 // ─── Auth Guards ─────────────────────────────────────────────
 const requireAuth = () => {
-  if (!getToken()) window.location.href = "/login.html";
+  if (!getToken()) window.location.href = "/login.html?msg=login_required";
 };
 
 const requireAdmin = () => {
@@ -114,6 +114,22 @@ const initNavbar = () => {
     }
   });
 };
+
+// ─── Global Guest Interceptor ──────────────────────────────
+document.addEventListener("click", (e) => {
+  const target = e.target.closest('a[href="/upload.html"], a[href="/requests.html"], button[onclick*="/upload.html"], button[onclick*="/requests.html"]');
+  if (target && !getToken()) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Check if it's the upload button or request button
+    const isUpload = (target.getAttribute("href") === "/upload.html") || 
+                     (target.getAttribute("onclick") || "").includes("upload.html");
+                     
+    const action = isUpload ? "upload" : "request";
+    showToast(`Please login to ${action} notes`, "error");
+  }
+}, true);
 
 // ─── Logout ──────────────────────────────────────────────────
 const logout = () => {

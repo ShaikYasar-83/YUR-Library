@@ -36,6 +36,7 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
   const subject = document.getElementById("up-subject").value.trim();
   const college = document.getElementById("up-college").value.trim();
   const desc = document.getElementById("up-desc").value.trim();
+  const semester = document.getElementById("up-semester").value;
   const file = fileInput.files[0];
 
   if (!title || !subject || !semester) { showToast("Title, Subject and Semester are required.", "error"); return; }
@@ -45,13 +46,13 @@ document.getElementById("upload-form").addEventListener("submit", async (e) => {
   if (!allowed.includes(file.type)) { showToast("Only PDF, JPG, PNG files allowed.", "error"); return; }
   if (file.size > 10 * 1024 * 1024) { showToast("File size cannot exceed 10MB.", "error"); return; }
 
-  const semester = document.getElementById("up-semester").value;
+  const formData = new FormData();
   formData.append("noteFile", file);
   formData.append("title", title);
   formData.append("subject", subject);
   formData.append("college", college || getUser().college || "");
   formData.append("description", desc);
-  if (semester) formData.append("semester", semester);
+  formData.append("semester", semester);
 
   const btnText = document.getElementById("upload-btn-text");
   const btnLoading = document.getElementById("upload-btn-loading");

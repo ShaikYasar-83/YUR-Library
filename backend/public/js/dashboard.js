@@ -42,7 +42,7 @@ const renderNotes = (notes) => {
 const noteCard = (note) => {
   const typeClass = (note.fileType || "pdf").toLowerCase().includes("pdf") ? "type-pdf" : "type-img";
   return `
-    <div class="modern-card">
+    <div class="modern-card" onclick="viewNote('${note._id}')" style="cursor:pointer;">
       <div class="card-header">
         <span class="card-type ${typeClass}">${note.fileType || "PDF"}</span>
         <span style="font-size:0.75rem; color:var(--text-muted);"><i class="bi bi-calendar3"></i> ${new Date(note.createdAt).toLocaleDateString()}</span>
@@ -63,13 +63,13 @@ const noteCard = (note) => {
           <span title="Rating"><i class="bi bi-star-fill text-warning" style="font-size:0.7rem;"></i> ${note.averageRating ? note.averageRating.toFixed(1) : "New"}</span>
         </div>
         <div class="card-actions">
-          <button class="btn-icon" onclick="viewNote('${note._id}')" title="View / Preview">
+          <button class="btn-icon" onclick="event.stopPropagation(); viewNote('${note._id}')" title="View / Preview">
             <i class="bi bi-eye"></i>
           </button>
-          <button class="btn-icon" onclick="openReview('${note._id}','${note.title.replace(/'/g,"\\'")}')" title="Leave Review">
+          <button class="btn-icon" onclick="event.stopPropagation(); openReview('${note._id}','${note.title.replace(/'/g,"\\'")}')" title="Leave Review">
             <i class="bi bi-chat-left-text"></i>
           </button>
-          <button class="btn-icon" style="background:var(--accent-1); color:#fff;" onclick="downloadNote('${note._id}','${note.title}')" title="Download">
+          <button class="btn-icon" style="background:var(--accent-1); color:#fff;" onclick="event.stopPropagation(); downloadNote('${note._id}')" title="Download">
             <i class="bi bi-cloud-arrow-down"></i>
           </button>
         </div>
@@ -141,23 +141,14 @@ document.getElementById("search-input").addEventListener("input", (e) => {
 });
 
 // ─── Download ──────────────────────────────────────────────
-const downloadNote = async (id, title) => {
-  try {
-    const token = getToken();
-    showToast("Starting download...", "success");
-    const headers = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
-    const res = await fetch(`${BASE_URL}/notes/download/${id}`, { headers });
-    if (!res.ok) { const d = await res.json(); throw new Error(d.message); }
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = title; a.click();
-    URL.revokeObjectURL(url);
-    // Refresh quietly
-    setTimeout(() => loadNotes(getFilters()), 1000);
-  } catch (err) { showToast("Download failed: " + err.message, "error"); }
+const downloadNote = (id) => {
+  const token = getToken();
+  const url = token 
+    ? `${BASE_URL}/notes/download/${id}?token=${token}` 
+    : `${BASE_URL}/notes/download/${id}`;
+    
+  window.open(url, "_blank");
+  setTimeout(() => loadNotes(getFilters()), 2000);
 };
 
 const viewNote = (id) => {
@@ -269,5 +260,19 @@ document.getElementById("submit-review-btn").addEventListener("click", async () 
   }
 });
 
+// ─── Record Visit ────────────────────────────────────────────
+const recordVisit = async () => {
+  try {
+    // Only record once per session to avoid spamming on refreshes
+    if (!sessionStorage.getItem("visit_recorded")) {
+      await apiFetch("/stats/visit", { method: "POST" });
+      sessionStorage.setItem("visit_recorded", "true");
+    }
+  } catch (err) {
+    console.error("Failed to record visit:", err);
+  }
+};
+
 // ─── Init ──────────────────────────────────────────────────
 loadNotes();
+recordVisit();

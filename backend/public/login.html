@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login — YUR LIBRARY</title>
+  <link rel="icon" type="image/jpeg" href="/favicon.jpeg"/>
   <script>
-     // Automatically redirect to the modern React-based login
-     window.location.href = "/login";
+     // Automatically redirect to the modern React-based login while preserving query parameters
+     window.location.href = "/login" + window.location.search;
   </script>
 </head>
 <body class="bright-theme">
