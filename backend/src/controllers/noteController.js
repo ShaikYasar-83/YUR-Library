@@ -118,10 +118,17 @@ const getAllNotes = async (req, res) => {
       .populate("uploadedBy", "name email college branch")
       .sort(sortOption);
 
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const mappedNotes = notes.map((note) => {
+      const noteObj = note.toObject();
+      noteObj.fileUrl = `${baseUrl}/api/notes/view/${note._id}`;
+      return noteObj;
+    });
+
     res.status(200).json({
       success: true,
-      count: notes.length,
-      data: notes,
+      count: mappedNotes.length,
+      data: mappedNotes,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -147,7 +154,10 @@ const getNoteById = async (req, res) => {
         .json({ success: false, message: "Note not found" });
     }
 
-    res.status(200).json({ success: true, data: note });
+    const noteObj = note.toObject();
+    noteObj.fileUrl = `${req.protocol}://${req.get("host")}/api/notes/view/${note._id}`;
+
+    res.status(200).json({ success: true, data: noteObj });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -165,10 +175,17 @@ const getMyNotes = async (req, res) => {
       createdAt: -1,
     });
 
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const mappedNotes = notes.map((note) => {
+      const noteObj = note.toObject();
+      noteObj.fileUrl = `${baseUrl}/api/notes/view/${note._id}`;
+      return noteObj;
+    });
+
     res.status(200).json({
       success: true,
-      count: notes.length,
-      data: notes,
+      count: mappedNotes.length,
+      data: mappedNotes,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -228,10 +245,17 @@ const getAllPendingNotes = async (req, res) => {
       .populate("uploadedBy", "name email college branch")
       .sort({ createdAt: 1 }); // oldest first — review in order
 
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const mappedNotes = notes.map((note) => {
+      const noteObj = note.toObject();
+      noteObj.fileUrl = `${baseUrl}/api/notes/view/${note._id}`;
+      return noteObj;
+    });
+
     res.status(200).json({
       success: true,
-      count: notes.length,
-      data: notes,
+      count: mappedNotes.length,
+      data: mappedNotes,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -345,11 +369,18 @@ const searchNotes = async (req, res) => {
       .populate("uploadedBy", "name email college branch")
       .sort({ score: { $meta: "textScore" } }); // best match first
 
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const mappedNotes = notes.map((note) => {
+      const noteObj = note.toObject();
+      noteObj.fileUrl = `${baseUrl}/api/notes/view/${note._id}`;
+      return noteObj;
+    });
+
     res.status(200).json({
       success: true,
-      count: notes.length,
+      count: mappedNotes.length,
       query: q,
-      data: notes,
+      data: mappedNotes,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
