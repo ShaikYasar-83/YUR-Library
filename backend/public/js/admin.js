@@ -61,9 +61,10 @@ const loadAdminNotes = async () => {
           <td>${statusBadge}</td>
           <td style="font-size:0.85rem;">${new Date(n.createdAt).toLocaleDateString()}</td>
           <td class="text-end">
-            <div class="d-flex gap-1 justify-content-end">
               ${actions}
+              <button class="btn btn-sm btn-outline-info" onclick="window.open('/api/notes/view/${n._id}?token=' + getToken(), '_blank')"><i class="bi bi-eye"></i> View</button>
               <button class="btn btn-sm btn-outline-light" onclick="openEditNoteModal('${n._id}')"><i class="bi bi-pencil"></i> Edit</button>
+              <button class="btn btn-sm btn-outline-danger" onclick="deleteNoteAdmin('${n._id}')" style="color: var(--danger);"><i class="bi bi-trash"></i> Delete</button>
             </div>
           </td>
         </tr>
@@ -132,6 +133,17 @@ window.updateNoteStatus = async (id, action) => {
   try {
     await apiFetch(`/notes/${action}/${id}`, { method: "PUT" });
     showToast(`Note ${action}d successfully!`, "success");
+    loadAdminNotes();
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+};
+
+window.deleteNoteAdmin = async (id) => {
+  if (!confirm("Are you sure you want to completely delete this note? This cannot be undone.")) return;
+  try {
+    await apiFetch(`/notes/admin/${id}`, { method: "DELETE" });
+    showToast("Note deleted successfully!", "success");
     loadAdminNotes();
   } catch (err) {
     showToast(err.message, "error");
@@ -248,6 +260,12 @@ const loadAdminStats = async () => {
     if (res && res.data) {
       document.getElementById("stat-users").textContent = res.data.happyUsersAlive.toLocaleString();
       document.getElementById("stat-visits").textContent = res.data.globalExplorations.toLocaleString();
+      
+      const pdfsElem = document.getElementById("stat-pdfs");
+      if (pdfsElem) pdfsElem.textContent = (res.data.totalPdfs || 0).toLocaleString();
+      
+      const downloadsElem = document.getElementById("stat-downloads");
+      if (downloadsElem) downloadsElem.textContent = (res.data.totalDownloads || 0).toLocaleString();
     }
   } catch (err) {
     console.error("Failed to load admin stats:", err);

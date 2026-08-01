@@ -1,5 +1,6 @@
 const Stat = require("../models/Stat");
 const User = require("../models/User");
+const Note = require("../models/Note");
 
 // @desc    Increment global website visits
 // @route   POST /api/stats/visit
@@ -27,11 +28,20 @@ const getAdminStats = async (req, res) => {
     let stat = await Stat.findOne({ type: "global" });
     if (!stat) stat = await Stat.create({ type: "global", visitsCount: 0 });
 
+    const totalPdfs = await Note.countDocuments({ fileType: "pdf" });
+    
+    const downloadsResult = await Note.aggregate([
+      { $group: { _id: null, totalDownloads: { $sum: "$downloadsCount" } } }
+    ]);
+    const totalDownloads = downloadsResult.length > 0 ? downloadsResult[0].totalDownloads : 0;
+
     res.status(200).json({
       success: true,
       data: {
         happyUsersAlive: usersCount,
-        globalExplorations: stat.visitsCount
+        globalExplorations: stat.visitsCount,
+        totalPdfs,
+        totalDownloads
       }
     });
   } catch (error) {

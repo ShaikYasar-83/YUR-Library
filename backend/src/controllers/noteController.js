@@ -366,7 +366,9 @@ const downloadNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
     if (!note) return res.status(404).json({ success: false, message: "Note not found" });
-    if (note.status !== "approved") return res.status(403).json({ success: false, message: "Not available" });
+    
+    const isAdmin = req.user && req.user.role === "admin";
+    if (note.status !== "approved" && !isAdmin) return res.status(403).json({ success: false, message: "Not available" });
 
     await Note.findByIdAndUpdate(req.params.id, { $inc: { downloadsCount: 1 } });
 
@@ -393,7 +395,9 @@ const viewNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
     if (!note) return res.status(404).json({ success: false, message: "Note not found" });
-    if (note.status !== "approved") return res.status(403).json({ success: false, message: "Not available" });
+    
+    const isAdmin = req.user && req.user.role === "admin";
+    if (note.status !== "approved" && !isAdmin) return res.status(403).json({ success: false, message: "Not available" });
 
     await Note.findByIdAndUpdate(req.params.id, { $inc: { viewsCount: 1 } });
 
@@ -531,6 +535,33 @@ const adminUpdateNote = async (req, res) => {
   }
 };
 
+const adminDeleteNote = async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({ success: false, message: "Note not found" });
+    }
+
+    const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+      bucketName: "notesFiles"
+    });
+    if (note.gridFsFileId) {
+      try {
+        await bucket.delete(note.gridFsFileId);
+      } catch (err) {
+        console.error("GridFS file not found for deletion", err);
+      }
+    }
+
+    await note.deleteOne();
+
+    res.status(200).json({ success: true, message: "Note deleted successfully by admin" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 module.exports = {
   uploadNote,
   bulkUploadNotes,
@@ -545,4 +576,5 @@ module.exports = {
   downloadNote,
   viewNote,
   adminUpdateNote,
+  adminDeleteNote,
 };

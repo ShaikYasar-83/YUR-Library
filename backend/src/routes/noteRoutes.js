@@ -15,6 +15,7 @@ const {
   downloadNote,
   viewNote,
   adminUpdateNote,
+  adminDeleteNote,
 } = require("../controllers/noteController");
 
 const { protect, getOptionalUser } = require("../middlewares/protect");
@@ -36,10 +37,10 @@ router.get("/search", searchNotes);
 router.get("/user/my-notes", protect, getMyNotes);
 
 // GET /api/notes/download/:id  → Download file + increment downloadsCount
-router.get("/download/:id", downloadNote);
+router.get("/download/:id", getOptionalUser, downloadNote);
 
 // GET /api/notes/view/:id      → View file inline + increment viewsCount
-router.get("/view/:id", viewNote);
+router.get("/view/:id", getOptionalUser, viewNote);
 
 // GET /api/notes/:id          → Get a single note by ID
 router.get("/:id", getNoteById);
@@ -92,6 +93,9 @@ router.post(
 
 // PUT /api/notes/admin/:id       → Admin edit note details
 router.put("/admin/:id", protect, isAdmin, adminUpdateNote);
+
+// DELETE /api/notes/admin/:id    → Admin delete note
+router.delete("/admin/:id", protect, isAdmin, adminDeleteNote);
 
 module.exports = router;
 
