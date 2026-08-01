@@ -76,7 +76,7 @@ const Signup = () => {
                 id="name"
                 type="text"
                 className="form-control"
-                placeholder="Jane Doe"
+                placeholder="john"
                 value={formData.name}
                 onChange={handleChange}
                 required
@@ -88,7 +88,7 @@ const Signup = () => {
                 id="email"
                 type="email"
                 className="form-control"
-                placeholder="you@college.edu"
+                placeholder="example@gmail.com"
                 value={formData.email}
                 onChange={handleChange}
                 required

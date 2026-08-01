@@ -13,11 +13,17 @@
     /* Admin-specific structural styling */
     .admin-panel {
       background: #ffffff;
-      border: 1px solid #94a3b8; /* Stronger High-Contrast Border */
-      border-radius: 12px;
-      padding: 2rem;
+      border: 1px solid #e2e8f0; /* Softer, premium border */
+      border-radius: 16px; /* Slightly softer corners */
+      padding: 2.5rem; /* Better spacing */
       margin-bottom: 3rem;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* Subtle, elegant shadow */
+      transition: all 0.3s ease; /* Smoother hover */
+    }
+
+    .admin-panel:hover {
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); /* Gentle lift on hover */
+      transform: translateY(-2px);
     }
 
     .admin-table-container {
@@ -27,32 +33,56 @@
     .admin-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
+      font-size: 0.95rem; /* Slightly larger, cleaner text */
     }
 
     .admin-table th,
     .admin-table td {
-      padding: 1.25rem 1rem;
+      padding: 1.5rem 1rem; /* More generous spacing */
       text-align: left;
-      border-bottom: 1px solid #cbd5e1;
+      vertical-align: middle; /* Consistent alignment */
+      border-bottom: 1px solid #f1f5f9; /* Extra soft border */
     }
 
     .admin-table th {
-      background: #f1f5f9;
-      color: var(--text-primary);
-      font-weight: 700;
+      background: #f8fafc; /* Softer background */
+      color: #64748b; /* Sleeker, muted text */
+      font-weight: 600; /* Cleaner typography */
       text-transform: uppercase;
       font-size: 0.75rem;
       letter-spacing: 0.05em;
+      border-bottom: 2px solid #e2e8f0;
     }
 
     .admin-table tbody tr {
-      transition: var(--transition);
-      border-bottom: 1px solid var(--border);
+      transition: all 0.25s ease;
     }
 
     .admin-table tbody tr:hover {
       background: #f8fafc;
+      transform: scale(1.002); /* Very subtle interaction */
+    }
+
+    /* Mobile Responsive Fixes */
+    body {
+      overflow-x: hidden; /* Prevent horizontal floating */
+      width: 100%;
+    }
+    
+    @media (max-width: 768px) {
+      .admin-panel {
+        padding: 1.25rem !important; /* Reduce padding to fit mobile screens */
+        margin-bottom: 1.5rem !important;
+      }
+      
+      .admin-table th,
+      .admin-table td {
+        padding: 1rem 0.5rem; /* Tighter table spacing */
+      }
+      
+      #stat-users, #stat-visits, #stat-pdfs, #stat-downloads {
+        font-size: 2.25rem !important; /* Scale down large stat numbers */
+      }
     }
   </style>
 </head>
@@ -101,27 +131,27 @@
     <section class="mb-5">
       <div class="row g-4">
         <div class="col-md-3">
-          <div class="admin-panel" style="margin-bottom:0; padding:1.5rem; text-align:center;">
-            <div style="font-size:2.5rem; font-weight:800; color:var(--primary);" id="stat-users">...</div>
-            <div style="color:var(--text-muted); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-top:0.5rem;"><i class="bi bi-person-check me-2"></i>Active Users</div>
+          <div class="admin-panel" style="margin-bottom:0; padding:2rem 1.5rem; text-align:center;">
+            <div style="font-size:3rem; font-weight:800; color:var(--primary); line-height:1.2;" id="stat-users">...</div>
+            <div style="color:var(--text-muted); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-top:0.75rem; display:flex; align-items:center; justify-content:center;"><i class="bi bi-person-check me-2" style="font-size:1.2rem;"></i>Active Users</div>
           </div>
         </div>
         <div class="col-md-3">
-          <div class="admin-panel" style="margin-bottom:0; padding:1.5rem; text-align:center;">
-            <div style="font-size:2.5rem; font-weight:800; color:var(--success);" id="stat-visits">...</div>
-            <div style="color:var(--text-muted); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-top:0.5rem;"><i class="bi bi-people me-2"></i>Total Users</div>
+          <div class="admin-panel" style="margin-bottom:0; padding:2rem 1.5rem; text-align:center;">
+            <div style="font-size:3rem; font-weight:800; color:var(--success); line-height:1.2;" id="stat-visits">...</div>
+            <div style="color:var(--text-muted); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-top:0.75rem; display:flex; align-items:center; justify-content:center;"><i class="bi bi-people me-2" style="font-size:1.2rem;"></i>Total Users</div>
           </div>
         </div>
         <div class="col-md-3">
-          <div class="admin-panel" style="margin-bottom:0; padding:1.5rem; text-align:center;">
-            <div style="font-size:2.5rem; font-weight:800; color:var(--warning);" id="stat-pdfs">...</div>
-            <div style="color:var(--text-muted); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-top:0.5rem;"><i class="bi bi-file-earmark-pdf me-2"></i>Total PDFs</div>
+          <div class="admin-panel" style="margin-bottom:0; padding:2rem 1.5rem; text-align:center;">
+            <div style="font-size:3rem; font-weight:800; color:var(--warning); line-height:1.2;" id="stat-pdfs">...</div>
+            <div style="color:var(--text-muted); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-top:0.75rem; display:flex; align-items:center; justify-content:center;"><i class="bi bi-file-earmark-pdf me-2" style="font-size:1.2rem;"></i>Total PDFs</div>
           </div>
         </div>
         <div class="col-md-3">
-          <div class="admin-panel" style="margin-bottom:0; padding:1.5rem; text-align:center;">
-            <div style="font-size:2.5rem; font-weight:800; color:var(--danger);" id="stat-downloads">...</div>
-            <div style="color:var(--text-muted); font-size:0.9rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; margin-top:0.5rem;"><i class="bi bi-cloud-arrow-down me-2"></i>Total Downloads</div>
+          <div class="admin-panel" style="margin-bottom:0; padding:2rem 1.5rem; text-align:center;">
+            <div style="font-size:3rem; font-weight:800; color:var(--danger); line-height:1.2;" id="stat-downloads">...</div>
+            <div style="color:var(--text-muted); font-size:0.95rem; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-top:0.75rem; display:flex; align-items:center; justify-content:center;"><i class="bi bi-cloud-arrow-down me-2" style="font-size:1.2rem;"></i>Total Downloads</div>
           </div>
         </div>
       </div>
