@@ -35,14 +35,14 @@ app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 // Serve existing static HTML files
 app.use(express.static(path.join(__dirname, "../public")));
 
-// Serve merged React App built static files
-app.use(express.static(path.join(__dirname, "../../frontend/dist")));
-
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-// Serve the React app natively on root, /login, and /signup routes
-app.get(["/", "/login", "/signup"], (req, res) => {
-  res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
+// Backend API Health Check
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "YUR Library Backend API is running"
+  });
 });
 
 // Auth routes (register, login)
