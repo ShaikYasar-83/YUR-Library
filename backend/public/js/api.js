@@ -2,7 +2,24 @@
 // api.js — Shared API helper for all pages (Redesigned)
 // ============================================================
 
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = "/api";
+
+// ─── Cross-Domain Auth Capture ───────────────────────────────
+// React frontend passes token via URL params after login. Capture and clean immediately.
+(function () {
+  const p = new URLSearchParams(window.location.search);
+  const t = p.get('_t');
+  const u = p.get('_u');
+  if (t && u) {
+    try {
+      localStorage.setItem('token', t);
+      localStorage.setItem('user', u);
+    } catch (e) {}
+    // Strip params from URL immediately so token is not visible
+    const clean = window.location.pathname;
+    window.history.replaceState({}, document.title, clean);
+  }
+})();
 
 // ─── Token Helpers ───────────────────────────────────────────
 const getToken  = ()       => localStorage.getItem("token");
@@ -136,5 +153,5 @@ const logout = () => {
   const user = getUser();
   const isAdminLogout = user && user.role === "admin";
   clearAuth();
-  window.location.href = isAdminLogout ? "/login?admin=true" : "/login";
+  window.location.href = isAdminLogout ? "/login.html?admin=true" : "/login.html";
 };

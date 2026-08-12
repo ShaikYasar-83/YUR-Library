@@ -6,7 +6,10 @@ let allNotes = [];
 let selectedRating = 0;
 
 // ─── Fetch & Render Notes ─────────────────────────────────────
-const loadNotes = async (params = {}) => {
+const loadNotes = async (params = {}, retryCount = 0) => {
+  const MAX_RETRIES = 4;
+  const RETRY_DELAY_MS = 4000;
+
   const query = new URLSearchParams();
   if (params.subject)  query.set("subject", params.subject);
   if (params.college)  query.set("college", params.college);
@@ -14,7 +17,12 @@ const loadNotes = async (params = {}) => {
   if (params.sort)     query.set("sort", params.sort);
 
   const container = document.getElementById("notes-container");
-  container.innerHTML = `<div class="loading-block"><div class="spinner"></div><p>Loading the best notes...</p></div>`;
+
+  if (retryCount === 0) {
+    container.innerHTML = `<div class="loading-block"><div class="spinner"></div><p>Loading the best notes...</p></div>`;
+  } else {
+    container.innerHTML = `<div class="loading-block"><div class="spinner"></div><p style="color:var(--text-muted)">Server is warming up... (attempt ${retryCount + 1}/${MAX_RETRIES + 1})</p></div>`;
+  }
 
   try {
     const qs = query.toString();
@@ -23,7 +31,18 @@ const loadNotes = async (params = {}) => {
     renderNotes(allNotes);
     populateFilters(allNotes);
   } catch (err) {
-    container.innerHTML = `<div style="text-align:center; padding: 4rem;"><i class="bi bi-exclamation-triangle" style="font-size:3rem; color:var(--danger)"></i><p class="mt-3">${err.message}</p></div>`;
+    // "Failed to fetch" is a network error (server sleeping / cold start on Render free tier)
+    const isNetworkError = err.message === "Failed to fetch" || err.message.includes("NetworkError") || err.message.includes("fetch");
+
+    if (isNetworkError && retryCount < MAX_RETRIES) {
+      container.innerHTML = `<div class="loading-block"><div class="spinner"></div><p style="color:var(--text-muted)">Server is warming up, please wait... <span style="font-size:0.8rem;">(${retryCount + 1}/${MAX_RETRIES})</span></p></div>`;
+      setTimeout(() => loadNotes(params, retryCount + 1), RETRY_DELAY_MS);
+    } else {
+      const hint = isNetworkError
+        ? "The server may be starting up. <a href='javascript:void(0)' onclick='loadNotes()' style='color:var(--accent-1);'>Try again</a>"
+        : err.message;
+      container.innerHTML = `<div style="text-align:center; padding: 4rem;"><i class="bi bi-wifi-off" style="font-size:3rem; color:var(--danger)"></i><p class="mt-3">${hint}</p></div>`;
+    }
   }
 };
 

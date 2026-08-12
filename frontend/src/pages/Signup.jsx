@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BASE_URL } from '../api';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -12,7 +13,7 @@ const Signup = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
-  
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
@@ -23,7 +24,7 @@ const Signup = () => {
     setErrorMsg('');
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch(`${BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -35,12 +36,11 @@ const Signup = () => {
         throw new Error(data.message || 'Registration failed');
       }
 
-      // Store tokens and immediately log the user in
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-
-      // Redirect to dashboard
-      window.location.href = '/dashboard.html';
+      // Pass token to Render via URL params (stripped immediately on arrival)
+      const p = new URLSearchParams();
+      p.set('_t', data.token);
+      p.set('_u', JSON.stringify(data.user));
+      window.location.href = `https://yur-library.onrender.com/dashboard.html?${p.toString()}`;
 
     } catch (err) {
       setErrorMsg(err.message);
@@ -54,7 +54,7 @@ const Signup = () => {
       <div className="auth-card" style={{ maxWidth: '480px' }}>
         <div className="auth-header">
           <div className="nav-logo" style={{ justifyContent: 'center', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
-            <img src="/images/logo.jpg" alt="YUR LIBRARY Logo" style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+            <img src="https://yur-library.onrender.com/images/logo.jpg" alt="YUR LIBRARY Logo" style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
             <span>Create Account</span>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>

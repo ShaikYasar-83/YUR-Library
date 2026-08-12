@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { BASE_URL } from '../api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -20,7 +21,7 @@ const Login = () => {
     setErrorMsg('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }) 
@@ -37,15 +38,15 @@ const Login = () => {
         throw new Error('Not authorized as an admin account.');
       }
 
-      // Store tokens
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Store token in Render's localStorage via URL params (stripped immediately on arrival)
+      const p = new URLSearchParams();
+      p.set('_t', data.token);
+      p.set('_u', JSON.stringify(data.user));
 
-      // Redirect legacy paths
       if (data.user.role === 'admin') {
-        window.location.href = '/admin-dashboard.html';
+        window.location.href = `https://yur-library.onrender.com/admin-dashboard.html?${p.toString()}`;
       } else {
-        window.location.href = '/dashboard.html';
+        window.location.href = `https://yur-library.onrender.com/dashboard.html?${p.toString()}`;
       }
 
     } catch (err) {
@@ -95,7 +96,7 @@ const Login = () => {
       <div className="auth-card">
         <div className="auth-header">
           <div className="nav-logo" style={{ justifyContent: 'center', marginBottom: '0.5rem', fontSize: '1.5rem' }}>
-            <img src="/images/logo.jpg" alt="YUR LIBRARY Logo" style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
+            <img src="https://yur-library.onrender.com/images/logo.jpg" alt="YUR LIBRARY Logo" style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", boxShadow: "0 4px 12px rgba(0,0,0,0.1)" }} />
             <span>{isAdmin ? 'Admin Portal' : 'YUR LIBRARY'}</span>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
@@ -169,7 +170,7 @@ const Login = () => {
             </div>
 
             <button 
-              onClick={() => window.location.href = '/dashboard.html'}
+              onClick={() => window.location.href = 'https://yur-library.onrender.com/dashboard.html'}
               style={{
                 width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--accent-1)', background: 'none',

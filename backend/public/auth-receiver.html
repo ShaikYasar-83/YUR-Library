@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auth Receiver</title>
+</head>
+<body>
+  <script>
+    // Listen for messages from the Vercel/React domain
+    window.addEventListener("message", (event) => {
+      // In a strict production environment, you'd check event.origin here.
+      if (event.data && event.data.type === "SET_AUTH") {
+        try {
+          localStorage.setItem("token", event.data.token);
+          localStorage.setItem("user", JSON.stringify(event.data.user));
+          // Send confirmation back to the parent window
+          event.source.postMessage({ type: "AUTH_SUCCESS" }, event.origin);
+        } catch (e) {
+          event.source.postMessage({ type: "AUTH_ERROR", error: e.message }, event.origin);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
