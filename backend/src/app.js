@@ -12,6 +12,9 @@ const errorHandler = require("./middlewares/errorHandler");
 // Initialize Express app
 const app = express();
 
+// Trust reverse proxy (for Render/Heroku HTTPS)
+app.set("trust proxy", 1);
+
 // ─── Middlewares ──────────────────────────────────────────────────────────────
 
 // Allow cross-origin requests (useful when a frontend calls this API)
