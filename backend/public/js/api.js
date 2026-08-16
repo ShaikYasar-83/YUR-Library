@@ -153,5 +153,5 @@ const logout = () => {
   const user = getUser();
   const isAdminLogout = user && user.role === "admin";
   clearAuth();
-  window.location.href = isAdminLogout ? "/login.html?admin=true" : "/login.html";
+  window.location.href = isAdminLogout ?  "https://yur-library.vercel.app/login?admin=true" : "https://yur-library.vercel.app/login";
 };
